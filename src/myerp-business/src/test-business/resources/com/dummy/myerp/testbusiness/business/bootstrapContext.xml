@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+
+
+<context:property-placeholder location="classpath:/com/dummy/myerp/testbusiness/business/db.properties" />
+    <import resource="classpath*:/com/dummy/myerp/consumer/applicationContext.xml" />
+    <import resource="classpath:/com/dummy/myerp/business/applicationContext.xml" />
+
+    <!-- Tests beans -->
+    <!-- BusinessProxy -->
+    <bean id="BusinessProxy"
+          class="com.dummy.myerp.business.impl.BusinessProxyImpl"
+          scope="singleton"
+          factory-method="getInstance">
+        <constructor-arg ref="DaoProxy"/>
+        <constructor-arg ref="TransactionManager"/>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="TransactionManager"
+          class="com.dummy.myerp.business.impl.TransactionManager"
+          scope="singleton"
+          factory-method="getInstance">
+        <constructor-arg ref="txManagerMYERP"/>
+    </bean>
+
+    <!-- PlatformTransactionManager pour le DataSource MYERP -->
+    <bean id="txManagerMYERP" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourceMYERP"/>
+    </bean>
+
+    <!-- DataSource for test -->
+    <bean id="dataSourceMYERP" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="url" value="${database.url}" />
+        <property name="driverClassName" value="${database.driver}" />
+        <property name="username" value="${database.username}" />
+        <property name="password" value="${database.password}" />
+    </bean>
+
+</beans>
